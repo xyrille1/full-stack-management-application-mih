@@ -1,0 +1,22 @@
+import mongoose from 'mongoose';
+
+/**
+ * Connect to MongoDB. Called before the HTTP server starts listening so the
+ * API never accepts requests it cannot serve.
+ */
+export const connectDB = async () => {
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri) {
+    console.error('MONGODB_URI is not set. Copy .env.example to .env first.');
+    process.exit(1);
+  }
+
+  try {
+    const conn = await mongoose.connect(uri);
+    console.log(`MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
+  } catch (err) {
+    console.error(`MongoDB connection failed: ${err.message}`);
+    process.exit(1);
+  }
+};

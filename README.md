@@ -95,8 +95,7 @@ frontend/src/
 
 ## AI assistance
 
-I used Claude Code to plan the work from the PRD, write the first version of the
-files, sort out the error cases (like checking an id looks valid before asking
-the database for it, so a junk id returns `400` rather than a server error), and
-test every endpoint. I chose how the project is organised, read through
-everything it wrote, and tested the app myself before committing.
+i used Claude Code to plan the work from the PRD, write the first version of the
+files, sort out the error cases, and
+test every endpoint. chose how thhe project is organised, read through
+everything it wrote, and tested the app myself before committing..

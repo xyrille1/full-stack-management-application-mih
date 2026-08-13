@@ -1,66 +1,42 @@
-# Full-Stack Task Management Application
+# Task Manager
 
-A simple task manager built on the MERN stack. It supports full CRUD: create tasks,
-view them in a list, edit their details, mark them complete or incomplete, and delete
-them. Errors are handled on both tiers — the API returns appropriate HTTP status
-codes, and the UI surfaces a readable message when a request fails.
+A small MERN task manager. You can add tasks, list them, edit the title and
+description, tick them off, and delete them. Both tiers handle failure: the API
+returns proper status codes, and the UI shows a readable message when a request
+goes wrong.
 
-## Tech Stack
+## Stack
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Database | **MongoDB** with Mongoose | Document store; Mongoose supplies the `Task` schema and validation |
-| Backend | **Express** on **Node.js** | RESTful JSON API, ES modules |
-| Frontend | **React** (via Vite) | Function components with hooks; Vite for the dev server and build |
-| Styling | Hand-written CSS | No UI framework — the brief calls for basic styling and functional focus |
+- **MongoDB** + Mongoose for storage and schema validation
+- **Express** on **Node.js** for the REST API (ES modules)
+- **React** via Vite on the frontend, function components and hooks
+- Plain CSS, no UI framework
 
-The stack is MERN as required: **M**ongoDB, **E**xpress, **R**eact, **N**ode.js.
+## Requirements
 
-## Prerequisites
+- Node.js 18+ (built on v22) and npm
+- [MongoDB Community Server](https://www.mongodb.com/docs/manual/administration/install-community/)
+  running locally
 
-- **Node.js 18+** (developed on v22) and npm
-- **MongoDB Community Server** running locally — [installation guide](https://www.mongodb.com/docs/manual/administration/install-community/)
+## Running it
 
-## Setup and Run
+**1. Start MongoDB.** On Windows it usually runs as a service already
+(`net start MongoDB`); on macOS use `brew services start mongodb-community`, on
+Linux `sudo systemctl start mongod`. You don't need to create anything by hand:
+Mongoose makes the `taskmanager` database and `tasks` collection on the first write.
 
-Three things need to be running: the database, the backend, then the frontend.
-
-### 1. Database
-
-Start MongoDB if it is not already running.
-
-- **Windows** — MongoDB usually installs as a service that starts automatically.
-  Verify with `sc query MongoDB`, or start it with:
-  ```bash
-  net start MongoDB
-  ```
-- **macOS (Homebrew)**
-  ```bash
-  brew services start mongodb-community
-  ```
-- **Linux (systemd)**
-  ```bash
-  sudo systemctl start mongod
-  ```
-
-No manual database or collection creation is needed — Mongoose creates the
-`taskmanager` database and `tasks` collection on first write.
-
-### 2. Backend
+**2. Backend:**
 
 ```bash
 cd backend
 npm install
-cp .env.example .env    # Windows PowerShell: copy .env.example .env
+cp .env.example .env   # PowerShell: copy .env.example .env
 npm run dev
 ```
 
-The API starts on **http://localhost:5000**. You should see `MongoDB connected: ...`
-followed by `API listening on http://localhost:5000`.
+You should see `MongoDB connected: ...` and then `API listening on http://localhost:5000`.
 
-### 3. Frontend
-
-In a second terminal:
+**3. Frontend**, in a second terminal:
 
 ```bash
 cd frontend
@@ -68,34 +44,29 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. The Vite dev server proxies `/api` requests through
-to the backend on port 5000, so no additional configuration is required.
+Open http://localhost:5173. Vite proxies `/api` to port 5000, so there's nothing
+else to configure.
 
-## Environment Variables
+## Environment variables
 
-Backend only, in `backend/.env` (copy from `backend/.env.example`):
+Only the backend needs them, in `backend/.env`:
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `MONGODB_URI` | Yes | `mongodb://127.0.0.1:27017/taskmanager` | MongoDB connection string. The server exits on startup if this is missing. |
-| `PORT` | No | `5000` | Port the API listens on. If you change it, update the proxy target in `frontend/vite.config.js`. |
+| Variable      | Required | Default                                 | Notes                                                                |
+| ------------- | -------- | --------------------------------------- | -------------------------------------------------------------------- |
+| `MONGODB_URI` | Yes      | `mongodb://127.0.0.1:27017/taskmanager` | Connection string. The server exits at startup if it's missing.      |
+| `PORT`        | No       | `5000`                                  | Change it and update the proxy in `frontend/vite.config.js` to match. |
 
-The frontend needs no environment variables; it calls the API using relative
-`/api` paths resolved by the Vite proxy.
-
-## API Reference
+## API
 
 Base URL: `http://localhost:5000`
 
-| Method | Endpoint | Description | Success | Errors |
-|---|---|---|---|---|
-| GET | `/api/tasks` | Retrieve all tasks (newest first) | `200` | — |
-| GET | `/api/tasks/:id` | Retrieve a single task by ID | `200` | `400` malformed id, `404` not found |
-| POST | `/api/tasks` | Create a new task | `201` | `400` missing or blank title |
-| PUT | `/api/tasks/:id` | Update a task (toggle completion, edit title/description) | `200` | `400` malformed id or invalid body, `404` not found |
-| DELETE | `/api/tasks/:id` | Delete a task | `200` | `400` malformed id, `404` not found |
+- `GET /api/tasks` — all tasks, newest first. `200`.
+- `GET /api/tasks/:id` — one task. `200`, or `400` for a bad id and `404` if it's missing.
+- `POST /api/tasks` — create a task. `201`, or `400` if the title is missing or blank.
+- `PUT /api/tasks/:id` — update the title, description, or done state. `200`, or `400` for a bad id or body and `404` if it's missing.
+- `DELETE /api/tasks/:id` — delete a task. `200`, or `400` for a bad id and `404` if it's missing.
 
-### Task shape
+A task looks like this:
 
 ```json
 {
@@ -108,10 +79,8 @@ Base URL: `http://localhost:5000`
 }
 ```
 
-`title` is required; `description` is optional and defaults to `""`; `is_completed`
-defaults to `false`. Errors are returned as `{ "error": "message" }`.
-
-### Example
+`title` is required, `description` defaults to `""`, `is_completed` to `false`.
+Errors come back as `{ "error": "message" }`.
 
 ```bash
 curl -X POST http://localhost:5000/api/tasks \
@@ -119,39 +88,30 @@ curl -X POST http://localhost:5000/api/tasks \
   -d '{"title":"Buy milk","description":"2 litres"}'
 ```
 
-## Project Structure
+## Layout
 
 ```
-backend/
-  src/
-    config/db.js                  MongoDB connection
-    models/Task.js                Mongoose schema
-    controllers/taskController.js Request handlers for the five endpoints
-    routes/tasks.js               Route definitions
-    middleware/errorHandler.js    404 + central error handling
-    app.js                        Express app assembly
-    index.js                      Entry point
-frontend/
-  src/
-    api/tasks.js                  Fetch wrapper for the API
-    components/                   TaskForm, TaskList, TaskItem, ErrorBanner
-    App.jsx                       State and handlers
-    index.css                     Styling
+backend/src/
+  config/db.js                  MongoDB connection
+  models/Task.js                Mongoose schema
+  controllers/taskController.js Handlers for the five endpoints
+  routes/tasks.js               Routes
+  middleware/errorHandler.js    404 + central error handling
+  app.js, index.js              App assembly and entry point
+frontend/src/
+  api/tasks.js                  Fetch wrapper
+  components/                   TaskForm, TaskList, TaskItem, ErrorBanner
+  App.jsx                       State and handlers
+  index.css                     Styling
 ```
 
-## AI Assistance
+## AI assistance
 
-I used **Claude (Claude Code)** to help build this project. Specifically, I used it to:
+I used Claude Code on this project to turn the PRD into an implementation plan
+with a traceability table, scaffold the backend and frontend, work through
+error-handling edge cases (validating `:id` before hitting MongoDB so a bad id
+returns `400` instead of a `CastError` becoming a `500`), and exercise every
+endpoint and error path once it was done.
 
-- Turn the requirements in `PRD.md` into a written implementation plan, including a
-  traceability table mapping each requirement to where it is implemented, so nothing
-  was missed.
-- Scaffold the backend and frontend files, and write the initial implementation of
-  the Express API, Mongoose model, and React components.
-- Work through error-handling edge cases — for example, validating the `:id`
-  parameter before querying MongoDB so a malformed id returns `400 Bad Request`
-  instead of surfacing a `CastError` as a `500`.
-- Verify the finished API by exercising every endpoint and error path.
-
-I reviewed the generated code, chose the project structure and conventions, and
-tested the application end-to-end before committing.
+I picked the structure and conventions, reviewed the generated code, and tested
+the app end to end before committing.

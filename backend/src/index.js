@@ -5,7 +5,16 @@ import { connectDB } from './config/db.js';
 const PORT = process.env.PORT || 5000;
 
 // Connect first: the API should not accept traffic without a database behind it.
-await connectDB();
+try {
+  const conn = await connectDB();
+  console.log(`MongoDB connected: ${conn.host}/${conn.name}`);
+} catch (err) {
+  console.error(`\nMongoDB connection failed: ${err.message}\n`);
+  if (!process.env.MONGODB_URI) {
+    console.error('Copy backend/.env.example to backend/.env first.\n');
+  }
+  process.exit(1);
+}
 
 const server = app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);

@@ -1,42 +1,35 @@
-# Task Manager
+# Full-Stack Task Manager
 
-A small MERN task manager. You can add tasks, list them, edit the title and
-description, tick them off, and delete them. Both tiers handle failure: the API
-returns proper status codes, and the UI shows a readable message when a request
-goes wrong.
+Add a task, edit it, mark it done, delete it. MongoDB and Mongoose for the
+database, Express and Node for the API, React and Vite for the page, plain CSS
+for the styling. If something goes wrong, the API answers with the right status
+code and the page shows a plain message instead of failing silently.
 
-## Stack
+## Before you start
 
-- **MongoDB** + Mongoose for storage and schema validation
-- **Express** on **Node.js** for the REST API (ES modules)
-- **React** via Vite on the frontend, function components and hooks
-- Plain CSS, no UI framework
-
-## Requirements
-
-- Node.js 18+ (built on v22) and npm
-- [MongoDB Community Server](https://www.mongodb.com/docs/manual/administration/install-community/)
-  running locally
+You need Node.js 18 or newer (I used v22) and
+[MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
+installed and running.
 
 ## Running it
 
-**1. Start MongoDB.** On Windows it usually runs as a service already
-(`net start MongoDB`); on macOS use `brew services start mongodb-community`, on
-Linux `sudo systemctl start mongod`. You don't need to create anything by hand:
-Mongoose makes the `taskmanager` database and `tasks` collection on the first write.
+**1. Start MongoDB.** On Windows it usually starts on its own, otherwise run
+`net start MongoDB`. On macOS use `brew services start mongodb-community`, on
+Linux `sudo systemctl start mongod`. You don't need to set up the database
+yourself, it's created the first time a task is saved.
 
-**2. Backend:**
+**2. Start the API:**
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # PowerShell: copy .env.example .env
+cp .env.example .env   # on Windows: copy .env.example .env
 npm run dev
 ```
 
-You should see `MongoDB connected: ...` and then `API listening on http://localhost:5000`.
+Wait for `API listening on http://localhost:5000`.
 
-**3. Frontend**, in a second terminal:
+**3. Start the app** in a second terminal:
 
 ```bash
 cd frontend
@@ -44,74 +37,66 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. Vite proxies `/api` to port 5000, so there's nothing
-else to configure.
+Open http://localhost:5173. It already knows to talk to the API on port 5000, so
+nothing else to set up.
 
-## Environment variables
+## Settings
 
-Only the backend needs them, in `backend/.env`:
+Only the API needs them, in `backend/.env`:
 
-| Variable      | Required | Default                                 | Notes                                                                |
-| ------------- | -------- | --------------------------------------- | -------------------------------------------------------------------- |
-| `MONGODB_URI` | Yes      | `mongodb://127.0.0.1:27017/taskmanager` | Connection string. The server exits at startup if it's missing.      |
-| `PORT`        | No       | `5000`                                  | Change it and update the proxy in `frontend/vite.config.js` to match. |
+- `MONGODB_URI` points at your database, `mongodb://127.0.0.1:27017/taskmanager`
+  by default. The server won't start without it.
+- `PORT` defaults to `5000`. If you change it, change the port in
+  `frontend/vite.config.js` too.
 
 ## API
 
-Base URL: `http://localhost:5000`
+Everything lives under `http://localhost:5000`:
 
-- `GET /api/tasks` — all tasks, newest first. `200`.
-- `GET /api/tasks/:id` — one task. `200`, or `400` for a bad id and `404` if it's missing.
-- `POST /api/tasks` — create a task. `201`, or `400` if the title is missing or blank.
-- `PUT /api/tasks/:id` — update the title, description, or done state. `200`, or `400` for a bad id or body and `404` if it's missing.
-- `DELETE /api/tasks/:id` — delete a task. `200`, or `400` for a bad id and `404` if it's missing.
+- `GET /api/tasks` gives you every task, newest first
+- `GET /api/tasks/:id` gives you one task
+- `POST /api/tasks` creates one and needs a title
+- `PUT /api/tasks/:id` updates the title, description, or done state
+- `DELETE /api/tasks/:id` deletes one
 
-A task looks like this:
+Creating returns `201`, everything else returns `200`. A bad id or a missing
+title returns `400`, and a task that isn't there returns `404`. Failures come
+back as `{ "error": "message" }`. A task looks like this:
 
 ```json
 {
-  "id": "6798b1f4c2a1d3e4f5a6b7c8",
-  "title": "Write the README",
-  "description": "Cover setup, stack, and env vars",
+  "id": "6a7d38a74cf2d100226d14c0",
+  "title": "Test",
+  "description": "Mih full stack",
   "is_completed": false,
-  "createdAt": "2026-08-13T02:31:16.482Z",
-  "updatedAt": "2026-08-13T02:31:16.482Z"
+  "createdAt": "2026-08-13T03:23:19.623Z",
+  "updatedAt": "2026-08-13T03:23:19.623Z"
 }
 ```
 
-`title` is required, `description` defaults to `""`, `is_completed` to `false`.
-Errors come back as `{ "error": "message" }`.
+Only the title is required. Description starts empty, tasks start unfinished.
 
-```bash
-curl -X POST http://localhost:5000/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Buy milk","description":"2 litres"}'
-```
-
-## Layout
+## Files
 
 ```
 backend/src/
-  config/db.js                  MongoDB connection
-  models/Task.js                Mongoose schema
-  controllers/taskController.js Handlers for the five endpoints
-  routes/tasks.js               Routes
-  middleware/errorHandler.js    404 + central error handling
-  app.js, index.js              App assembly and entry point
+  config/db.js                  connects to the database
+  models/Task.js                what a task holds
+  controllers/taskController.js the five endpoints
+  routes/tasks.js               which URL runs what
+  middleware/errorHandler.js    turns problems into clean responses
+  app.js, index.js              puts it together and starts it
 frontend/src/
-  api/tasks.js                  Fetch wrapper
+  api/tasks.js                  calls the API
   components/                   TaskForm, TaskList, TaskItem, ErrorBanner
-  App.jsx                       State and handlers
-  index.css                     Styling
+  App.jsx                       holds the tasks and the handlers
+  index.css                     styling
 ```
 
 ## AI assistance
 
-I used Claude Code on this project to turn the PRD into an implementation plan
-with a traceability table, scaffold the backend and frontend, work through
-error-handling edge cases (validating `:id` before hitting MongoDB so a bad id
-returns `400` instead of a `CastError` becoming a `500`), and exercise every
-endpoint and error path once it was done.
-
-I picked the structure and conventions, reviewed the generated code, and tested
-the app end to end before committing.
+I used Claude Code to plan the work from the PRD, write the first version of the
+files, sort out the error cases (like checking an id looks valid before asking
+the database for it, so a junk id returns `400` rather than a server error), and
+test every endpoint. I chose how the project is organised, read through
+everything it wrote, and tested the app myself before committing.

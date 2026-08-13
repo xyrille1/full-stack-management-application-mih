@@ -1,13 +1,13 @@
 # Full-Stack Task Manager
 
-Add a task, edit it, mark it done, delete it. MongoDB and Mongoose for the
-database, Express and Node for the API, React and Vite for the page, plain CSS
+You can add,edit,mark, and delete it. MongoDB and Mongoose for the
+database, express and Node for the API, Rreact and vite for the page, plain css
 for the styling. If something goes wrong, the API answers with the right status
 code and the page shows a plain message instead of failing silently.
 
 ## Before you start
 
-You need Node.js 18 or newer (I used v22) and
+You need Node.js 18 or newer (v22 po ginamit) and
 [MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
 installed and running.
 
@@ -23,7 +23,7 @@ yourself, it's created the first time a task is saved.
 ```bash
 cd backend
 npm install
-cp .env.example .env   # on Windows: copy .env.example .env
+cp .env.example .env   # for windows command lang po
 npm run dev
 ```
 
@@ -42,7 +42,7 @@ nothing else to set up.
 
 ## Settings
 
-Only the API needs them, in `backend/.env`:
+onlyy the API needs them, in `backend/.env`:
 
 - `MONGODB_URI` points at your database, `mongodb://127.0.0.1:27017/taskmanager`
   by default. The server won't start without it.
@@ -51,17 +51,17 @@ Only the API needs them, in `backend/.env`:
 
 ## API
 
-Everything lives under `http://localhost:5000`:
+its all live under `http://localhost:5000`:
 
-- `GET /api/tasks` gives you every task, newest first
+- `GET /api/tasks` give everytask, newest first
 - `GET /api/tasks/:id` gives you one task
 - `POST /api/tasks` creates one and needs a title
 - `PUT /api/tasks/:id` updates the title, description, or done state
 - `DELETE /api/tasks/:id` deletes one
 
-Creating returns `201`, everything else returns `200`. A bad id or a missing
+creeating returns `201`, everything else returns `200`. A bad id or a missing
 title returns `400`, and a task that isn't there returns `404`. Failures come
-back as `{ "error": "message" }`. A task looks like this:
+back as `{ "error": "message" }`. a task looks like this:
 
 ```json
 {
@@ -74,23 +74,23 @@ back as `{ "error": "message" }`. A task looks like this:
 }
 ```
 
-Only the title is required. Description starts empty, tasks start unfinished.
+title is required, description start emtry
 
 ## Files
 
 ```
 backend/src/
-  config/db.js                  connects to the database
-  models/Task.js                what a task holds
-  controllers/taskController.js the five endpoints
-  routes/tasks.js               which URL runs what
-  middleware/errorHandler.js    turns problems into clean responses
-  app.js, index.js              puts it together and starts it
+  config/db.js
+  models/Task.js
+  controllers/taskController.js
+  routes/tasks.js
+  middleware/errorHandler.js
+  app.js, index.js
 frontend/src/
-  api/tasks.js                  calls the API
-  components/                   TaskForm, TaskList, TaskItem, ErrorBanner
-  App.jsx                       holds the tasks and the handlers
-  index.css                     styling
+  api/tasks.js
+  components/
+  App.jsx
+  index.css
 ```
 
 ## AI assistance

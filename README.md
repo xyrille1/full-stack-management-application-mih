@@ -99,3 +99,7 @@ i used Claude Code to plan the work from the PRD, write the first version of the
 files, sort out the error cases, and
 test every endpoint. chose how thhe project is organised, read through
 everything it wrote, and tested the app myself before committing..
+
+## Vercel/Deployed
+
+website: https://full-stack-management-application-k7af35iea.vercel.app/
